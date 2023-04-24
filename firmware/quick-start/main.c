@@ -223,10 +223,12 @@ void i2c2_tx(int addr, int *write_buf, int write_num, int *read_buf, int read_nu
 			while (!(I2C2->ISR & 1)); // while not TXE 
 			I2C2->TXDR = *write_buf++;
 		}
+		if (read_num) {
+			while (!(I2C2->ISR & 1 << 6)); // while not TC 
+			//while (!(I2C2->ISR & 1)); // while not TXE 
+		}
 	}
 	if (read_num) {
-		//while (!(I2C2->ISR & 1 << 6)); // while not TC 
-		while (!(I2C2->ISR & 1)); // while not TXE 
 		I2C2->CR2 = 
 			(I2C2->CR2 & 0xFF00FC00) // mask away addr and num of bytes bitfields 
 			| (addr & 0x3FF) // set outgoing slave address 
