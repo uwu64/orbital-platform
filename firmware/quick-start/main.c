@@ -71,7 +71,7 @@ void SysTick_Handler() {
 	systick_time++;
 	
 	// use d7 to d0 to display system time 
-	GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | (systick_time >> 4) & 0xFF; 
+//	GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | (systick_time >> 4) & 0xFF; 
 	
 	// heartbeat led 
 	if (!(systick_time % 1000)) {
@@ -185,7 +185,7 @@ void softi2c_init_pins(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_
 }
 
 void softi2c_delay() {
-	nop(core_MHz);
+	nop(30);
 }
 
 void softi2c_sig_start(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port, int sda_pin) {
@@ -296,6 +296,8 @@ int softi2c_reg_read(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_po
 }
 
 #define OB_I2C2 GPIOF, 1, GPIOF, 0
+#define IMU_ADDR 0x6A 
+#define MAG_ADDR 0x0D 
 
 int main() {
 	init_clocks();
@@ -303,12 +305,28 @@ int main() {
 	init_gpio();
 	softi2c_init_pins(OB_I2C2);
 	
-	softi2c_reg_write(OB_I2C2, 0x0D, 0x01, 0x09);
-	softi2c_reg_read(OB_I2C2, 0x0D, 0x1D);
+	softi2c_reg_write(OB_I2C2, MAG_ADDR, 0x0B, 0x01);  
+	softi2c_reg_write(OB_I2C2, MAG_ADDR, 0x09, 0x1D); 
+	softi2c_reg_read(OB_I2C2, MAG_ADDR, 0x07);
 
-	while(1) { // blinky 
+	while(1) { 
 		op_led_c(!gpio_read(GPIOB, 11));
+		nop(10000);
+		int temp = (softi2c_reg_read(OB_I2C2, MAG_ADDR, 0x08) << 8) | softi2c_reg_read(OB_I2C2, MAG_ADDR, 0x07);
+		GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | (temp>>3) & 0xFF;
 	}
+
+	// softi2c_reg_write(OB_I2C2, IMU_ADDR, 0x12, 0x01); // soft reset imu  
+	// softi2c_reg_write(OB_I2C2, IMU_ADDR, 0x10, 0xA0); // imu acel start 
+	// softi2c_reg_write(OB_I2C2, IMU_ADDR, 0x11, 0x10); // imu gyro start 
+	// softi2c_reg_read(OB_I2C2, IMU_ADDR, 0x29);
+	// softi2c_reg_read(OB_I2C2, IMU_ADDR, 0x28);
+
+	// while(1) { // blinky 
+	// 	op_led_c(!gpio_read(GPIOB, 11));
+	// 	nop(100000);
+	// 	GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | (softi2c_reg_read(OB_I2C2, IMU_ADDR, 0x28)) & 0xFF;
+	// }
 }
 
 
