@@ -1,0 +1,16 @@
+
+firmware/quick-start/DebugConfig/Target_1_STM32L476ZGTx.dbgconf
+firmware/quick-start/Listings/bringup1.map
+firmware/quick-start/Objects/bringup1.build_log.htm
+firmware/quick-start/Objects/bringup1.axf
+firmware/quick-start/Objects/bringup1.hex
+firmware/quick-start/Objects/bringup1.htm
+firmware/quick-start/Objects/bringup1.lnp
+firmware/quick-start/Objects/bringup1.sct
+firmware/quick-start/Objects/bringup1_Target 1.dep
+firmware/quick-start/Objects/ExtDll.iex
+firmware/quick-start/Objects/main.d
+firmware/quick-start/Objects/main.o
+firmware/quick-start/Objects/startup_stm32l476xx.o
+firmware/quick-start/Objects/system_stm32l4xx.d
+firmware/quick-start/Objects/system_stm32l4xx.o
