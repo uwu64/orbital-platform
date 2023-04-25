@@ -295,43 +295,125 @@ int softi2c_reg_read(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_po
 	return data;
 }
 
+int softi2c_probe(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port, int sda_pin, int device_addr) {
+	int nack = 0; 
+	softi2c_sig_start(scl_port, scl_pin, sda_port, sda_pin);
+	softi2c_send8(scl_port, scl_pin, sda_port, sda_pin, device_addr << 1 | 1);
+	nack += softi2c_read_nack(scl_port, scl_pin, sda_port, sda_pin);
+	softi2c_sig_stop(scl_port, scl_pin, sda_port, sda_pin);
+	if (nack) {
+		return 0;
+	} else {
+		return 1; 
+	}
+}
+
 void init_adc() {
 	GPIOA->MODER |= 0x3 << (1*2);
 	
 }
 
-#define OB_I2C2 GPIOF, 1, GPIOF, 0
+#define OP1_I2C2 GPIOF, 1, GPIOF, 0
 #define IMU_ADDR 0x6A 
 #define MAG_ADDR 0x0D 
+
+#define IMU_ODR_OFF 		0 
+#define IMU_ODR_12_5_Hz 	1 
+#define IMU_ODR_26_Hz 		2 
+#define IMU_ODR_52_Hz 		3 
+#define IMU_ODR_104_Hz 		4 
+#define IMU_ODR_208_Hz 		5 
+#define IMU_ODR_417_Hz 		6 
+#define IMU_ODR_833_Hz 		7 
+#define IMU_ODR_1667_Hz 	8 
+#define IMU_ODR_3333_Hz 	9 
+#define IMU_ODR_6667_Hz 	10 
+#define IMU_FS_2_g 			0 
+#define IMU_FS_4_g 			2 
+#define IMU_FS_8_g 			3 
+#define IMU_FS_16_g 		1 
+#define IMU_FS_125_dps 		2 
+#define IMU_FS_250_dps 		0 
+#define IMU_FS_500_dps 		4 
+#define IMU_FS_1000_dps 	8 
+#define IMU_FS_2000_dps 	12 
+#define IMU_FS_4000_dps 	1 
+
+void op1_imu_acel_ctrl(int acel_rate, int acel_scale, int digital_filter_on) {
+	acel_rate &= 0xFF;
+	acel_scale &= 0xF;
+	digital_filter_on &= 1;
+	int data = acel_rate << 4 | acel_scale << 2 | digital_filter_on << 1;
+	softi2c_reg_write(OP1_I2C2, IMU_ADDR, 0x10, data); 
+}
+
+void op1_imu_gyro_ctrl(int gyro_rate, int gyro_scale) {
+	gyro_rate &= 0xFF;
+	gyro_scale &= 0xFF; 
+	int data = gyro_rate << 4 | gyro_scale;
+	softi2c_reg_write(OP1_I2C2, IMU_ADDR, 0x11, data); 
+}
+
+void op1_imu_init(int acel_rate, int acel_scale, int gyro_rate, int gyro_scale) {
+	softi2c_reg_write(OP1_I2C2, IMU_ADDR, 0x12, 0x01); // soft reset imu  
+	nop(100); 
+	op1_imu_acel_ctrl(acel_rate, acel_scale, 0);
+	op1_imu_gyro_ctrl(gyro_rate, gyro_scale);
+} 
+
+int op1_imu_read_acel_x() {
+	return softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x29) << 8 | softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x28);
+}
+
+int op1_imu_read_acel_y() {
+	return softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x2B) << 8 | softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x2A);
+}
+
+int op1_imu_read_acel_z() {
+	return softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x2D) << 8 | softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x2C);
+}
+
+int op1_imu_read_gyro_x() {
+	return softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x23) << 8 | softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x22);
+}
+
+int op1_imu_read_gyro_y() {
+	return softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x25) << 8 | softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x24);
+}
+
+int op1_imu_read_gyro_z() {
+	return softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x27) << 8 | softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x26);
+}
+
+int op1_imu_read_temp() {
+	return softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x21) << 8 | softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x20);
+}
 
 int main() {
 	init_clocks();
 	init_nvic();
 	init_gpio();
-	softi2c_init_pins(OB_I2C2);
+	softi2c_init_pins(OP1_I2C2);
 	
-	softi2c_reg_write(OB_I2C2, MAG_ADDR, 0x0B, 0x01);  
-	softi2c_reg_write(OB_I2C2, MAG_ADDR, 0x09, 0x1D); 
-	softi2c_reg_read(OB_I2C2, MAG_ADDR, 0x08); // temp high byte 
-	softi2c_reg_read(OB_I2C2, MAG_ADDR, 0x07); // temp low byte 
+	softi2c_reg_write(OP1_I2C2, MAG_ADDR, 0x0B, 0x01);  
+	softi2c_reg_write(OP1_I2C2, MAG_ADDR, 0x09, 0x1D); 
+	softi2c_reg_read(OP1_I2C2, MAG_ADDR, 0x08); // temp high byte 
+	softi2c_reg_read(OP1_I2C2, MAG_ADDR, 0x07); // temp low byte 
 
 	// while(1) { 
 	// 	op_led_c(!gpio_read(GPIOB, 11));
 	// 	nop(10000);
-	// 	int temp = (softi2c_reg_read(OB_I2C2, MAG_ADDR, 0x08) << 8) | softi2c_reg_read(OB_I2C2, MAG_ADDR, 0x07);
+	// 	int temp = (softi2c_reg_read(OP1_I2C2, MAG_ADDR, 0x08) << 8) | softi2c_reg_read(OP1_I2C2, MAG_ADDR, 0x07);
 	// 	GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | (temp>>3) & 0xFF;
 	// }
 
-	softi2c_reg_write(OB_I2C2, IMU_ADDR, 0x12, 0x01); // soft reset imu  
-	softi2c_reg_write(OB_I2C2, IMU_ADDR, 0x10, 0xA0); // imu acel start 
-	softi2c_reg_write(OB_I2C2, IMU_ADDR, 0x11, 0x10); // imu gyro start 
-	softi2c_reg_read(OB_I2C2, IMU_ADDR, 0x29); // acel x high 
-	softi2c_reg_read(OB_I2C2, IMU_ADDR, 0x28); // acel x low 
+	op1_imu_init(IMU_ODR_3333_Hz, IMU_FS_2_g, IMU_ODR_3333_Hz, IMU_FS_1000_dps);
 
 	while(1) { // blinky 
 		op_led_c(!gpio_read(GPIOB, 11));
 		nop(100000);
-		GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | (softi2c_reg_read(OB_I2C2, IMU_ADDR, 0x29)) & 0xFF;
+		int value = op1_imu_read_temp() >> 4;
+		GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | value & 0xFF;
 	}
 }
 
