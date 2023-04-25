@@ -5,6 +5,8 @@
 // This is not permissively licensed software. 
 
 #include <stm32l476xx.h>
+#include <math.h> // for sqrt 
+typedef enum { false, true } bool;
 
 void nop(int nop_loops) {
 	for (int i = 0; i < nop_loops; i++) {__NOP();}
@@ -266,7 +268,7 @@ int softi2c_read_nack(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_p
 	return nack; 
 }
 
-int softi2c_reg_write(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port, int sda_pin, int device_addr, int reg_addr, int data) {
+int softi2c_write_reg(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port, int sda_pin, int device_addr, int reg_addr, int data) {
 	int nack = 0; 
 	softi2c_sig_start(scl_port, scl_pin, sda_port, sda_pin);
 	softi2c_send8(scl_port, scl_pin, sda_port, sda_pin, device_addr << 1 | 0);
@@ -279,7 +281,7 @@ int softi2c_reg_write(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_p
 	return nack; 
 }
 
-int softi2c_reg_read(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port, int sda_pin, int device_addr, int reg_addr) {
+int softi2c_read_reg(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port, int sda_pin, int device_addr, int reg_addr) {
 	int nack = 0; 
 	softi2c_sig_start(scl_port, scl_pin, sda_port, sda_pin);
 	softi2c_send8(scl_port, scl_pin, sda_port, sda_pin, device_addr << 1 | 0);
@@ -295,7 +297,7 @@ int softi2c_reg_read(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_po
 	return data;
 }
 
-int softi2c_probe(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port, int sda_pin, int device_addr) {
+bool softi2c_probe(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port, int sda_pin, int device_addr) {
 	int nack = 0; 
 	softi2c_sig_start(scl_port, scl_pin, sda_port, sda_pin);
 	softi2c_send8(scl_port, scl_pin, sda_port, sda_pin, device_addr << 1 | 1);
@@ -306,6 +308,10 @@ int softi2c_probe(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port,
 	} else {
 		return 1; 
 	}
+}
+
+int16_t softi2c_read_reg_hl(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port, int sda_pin, int device_addr, int high_reg_addr, int low_reg_addr) {
+	return softi2c_read_reg(scl_port, scl_pin, sda_port, sda_pin, device_addr, high_reg_addr) << 8 | softi2c_read_reg(scl_port, scl_pin, sda_port, sda_pin, device_addr, low_reg_addr);
 }
 
 void init_adc() {
@@ -344,49 +350,57 @@ void op1_imu_acel_ctrl(int acel_rate, int acel_scale, int digital_filter_on) {
 	acel_scale &= 0xF;
 	digital_filter_on &= 1;
 	int data = acel_rate << 4 | acel_scale << 2 | digital_filter_on << 1;
-	softi2c_reg_write(OP1_I2C2, IMU_ADDR, 0x10, data); 
+	softi2c_write_reg(OP1_I2C2, IMU_ADDR, 0x10, data); 
 }
 
 void op1_imu_gyro_ctrl(int gyro_rate, int gyro_scale) {
 	gyro_rate &= 0xFF;
 	gyro_scale &= 0xFF; 
 	int data = gyro_rate << 4 | gyro_scale;
-	softi2c_reg_write(OP1_I2C2, IMU_ADDR, 0x11, data); 
+	softi2c_write_reg(OP1_I2C2, IMU_ADDR, 0x11, data); 
 }
 
 void op1_imu_init(int acel_rate, int acel_scale, int gyro_rate, int gyro_scale) {
-	softi2c_reg_write(OP1_I2C2, IMU_ADDR, 0x12, 0x01); // soft reset imu  
+	softi2c_write_reg(OP1_I2C2, IMU_ADDR, 0x12, 0x01); // soft reset imu  
 	nop(100); 
 	op1_imu_acel_ctrl(acel_rate, acel_scale, 0);
 	op1_imu_gyro_ctrl(gyro_rate, gyro_scale);
 } 
 
-int op1_imu_read_acel_x() {
-	return softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x29) << 8 | softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x28);
+int16_t op1_imu_read_acel_x() {
+	return softi2c_read_reg_hl(OP1_I2C2, IMU_ADDR, 0x29, 0x28);
 }
 
-int op1_imu_read_acel_y() {
-	return softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x2B) << 8 | softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x2A);
+int16_t op1_imu_read_acel_y() {
+	return softi2c_read_reg_hl(OP1_I2C2, IMU_ADDR, 0x2B, 0x2A);
 }
 
-int op1_imu_read_acel_z() {
-	return softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x2D) << 8 | softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x2C);
+int16_t op1_imu_read_acel_z() {
+	return softi2c_read_reg_hl(OP1_I2C2, IMU_ADDR, 0x2D, 0x2C);
 }
 
-int op1_imu_read_gyro_x() {
-	return softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x23) << 8 | softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x22);
+int16_t op1_imu_read_gyro_x() {
+	return softi2c_read_reg_hl(OP1_I2C2, IMU_ADDR, 0x23, 0x22);
 }
 
-int op1_imu_read_gyro_y() {
-	return softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x25) << 8 | softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x24);
+int16_t op1_imu_read_gyro_y() {
+	return softi2c_read_reg_hl(OP1_I2C2, IMU_ADDR, 0x25, 0x24);
 }
 
-int op1_imu_read_gyro_z() {
-	return softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x27) << 8 | softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x26);
+int16_t op1_imu_read_gyro_z() {
+	return softi2c_read_reg_hl(OP1_I2C2, IMU_ADDR, 0x27, 0x26);
 }
 
-int op1_imu_read_temp() {
-	return softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x21) << 8 | softi2c_reg_read(OP1_I2C2, IMU_ADDR, 0x20);
+int16_t op1_imu_read_temp() {
+	return softi2c_read_reg_hl(OP1_I2C2, IMU_ADDR, 0x21, 0x20);
+}
+
+unsigned int abs16(int16_t a) {
+	if (a < 0) {
+		return (a * -1);
+	} else {
+		return a;
+	}
 }
 
 int main() {
@@ -395,15 +409,15 @@ int main() {
 	init_gpio();
 	softi2c_init_pins(OP1_I2C2);
 	
-	softi2c_reg_write(OP1_I2C2, MAG_ADDR, 0x0B, 0x01);  
-	softi2c_reg_write(OP1_I2C2, MAG_ADDR, 0x09, 0x1D); 
-	softi2c_reg_read(OP1_I2C2, MAG_ADDR, 0x08); // temp high byte 
-	softi2c_reg_read(OP1_I2C2, MAG_ADDR, 0x07); // temp low byte 
+	softi2c_write_reg(OP1_I2C2, MAG_ADDR, 0x0B, 0x01);  
+	softi2c_write_reg(OP1_I2C2, MAG_ADDR, 0x09, 0x1D); 
+	softi2c_read_reg(OP1_I2C2, MAG_ADDR, 0x08); // temp high byte 
+	softi2c_read_reg(OP1_I2C2, MAG_ADDR, 0x07); // temp low byte 
 
 	// while(1) { 
 	// 	op_led_c(!gpio_read(GPIOB, 11));
 	// 	nop(10000);
-	// 	int temp = (softi2c_reg_read(OP1_I2C2, MAG_ADDR, 0x08) << 8) | softi2c_reg_read(OP1_I2C2, MAG_ADDR, 0x07);
+	// 	int temp = (softi2c_read_reg(OP1_I2C2, MAG_ADDR, 0x08) << 8) | softi2c_read_reg(OP1_I2C2, MAG_ADDR, 0x07);
 	// 	GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | (temp>>3) & 0xFF;
 	// }
 
@@ -412,7 +426,11 @@ int main() {
 	while(1) { // blinky 
 		op_led_c(!gpio_read(GPIOB, 11));
 		nop(100000);
-		int value = op1_imu_read_temp() >> 4;
+		int16_t ax = op1_imu_read_acel_x();
+		int16_t ay = op1_imu_read_acel_y();
+		int16_t az = op1_imu_read_acel_z();
+		int amag = sqrt(ax^2 + ay^2 + az^2);
+		int value = abs16(op1_imu_read_gyro_z()) >> 8; 
 		GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | value & 0xFF;
 	}
 }
