@@ -295,6 +295,11 @@ int softi2c_reg_read(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_po
 	return data;
 }
 
+void init_adc() {
+	GPIOA->MODER |= 0x3 << (1*2);
+	
+}
+
 #define OB_I2C2 GPIOF, 1, GPIOF, 0
 #define IMU_ADDR 0x6A 
 #define MAG_ADDR 0x0D 
@@ -307,26 +312,27 @@ int main() {
 	
 	softi2c_reg_write(OB_I2C2, MAG_ADDR, 0x0B, 0x01);  
 	softi2c_reg_write(OB_I2C2, MAG_ADDR, 0x09, 0x1D); 
-	softi2c_reg_read(OB_I2C2, MAG_ADDR, 0x07);
+	softi2c_reg_read(OB_I2C2, MAG_ADDR, 0x08); // temp high byte 
+	softi2c_reg_read(OB_I2C2, MAG_ADDR, 0x07); // temp low byte 
 
-	while(1) { 
-		op_led_c(!gpio_read(GPIOB, 11));
-		nop(10000);
-		int temp = (softi2c_reg_read(OB_I2C2, MAG_ADDR, 0x08) << 8) | softi2c_reg_read(OB_I2C2, MAG_ADDR, 0x07);
-		GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | (temp>>3) & 0xFF;
-	}
-
-	// softi2c_reg_write(OB_I2C2, IMU_ADDR, 0x12, 0x01); // soft reset imu  
-	// softi2c_reg_write(OB_I2C2, IMU_ADDR, 0x10, 0xA0); // imu acel start 
-	// softi2c_reg_write(OB_I2C2, IMU_ADDR, 0x11, 0x10); // imu gyro start 
-	// softi2c_reg_read(OB_I2C2, IMU_ADDR, 0x29);
-	// softi2c_reg_read(OB_I2C2, IMU_ADDR, 0x28);
-
-	// while(1) { // blinky 
+	// while(1) { 
 	// 	op_led_c(!gpio_read(GPIOB, 11));
-	// 	nop(100000);
-	// 	GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | (softi2c_reg_read(OB_I2C2, IMU_ADDR, 0x28)) & 0xFF;
+	// 	nop(10000);
+	// 	int temp = (softi2c_reg_read(OB_I2C2, MAG_ADDR, 0x08) << 8) | softi2c_reg_read(OB_I2C2, MAG_ADDR, 0x07);
+	// 	GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | (temp>>3) & 0xFF;
 	// }
+
+	softi2c_reg_write(OB_I2C2, IMU_ADDR, 0x12, 0x01); // soft reset imu  
+	softi2c_reg_write(OB_I2C2, IMU_ADDR, 0x10, 0xA0); // imu acel start 
+	softi2c_reg_write(OB_I2C2, IMU_ADDR, 0x11, 0x10); // imu gyro start 
+	softi2c_reg_read(OB_I2C2, IMU_ADDR, 0x29); // acel x high 
+	softi2c_reg_read(OB_I2C2, IMU_ADDR, 0x28); // acel x low 
+
+	while(1) { // blinky 
+		op_led_c(!gpio_read(GPIOB, 11));
+		nop(100000);
+		GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | (softi2c_reg_read(OB_I2C2, IMU_ADDR, 0x29)) & 0xFF;
+	}
 }
 
 
