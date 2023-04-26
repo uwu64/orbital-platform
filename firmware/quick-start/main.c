@@ -122,11 +122,19 @@ void init_gpio() {
 	GPIOG->MODER = 0x01445000; // leds 
 }
 
+void gpio_high(GPIO_TypeDef * port, int pin) {
+	port->BSRR = 1 << pin;
+}
+
+void gpio_low(GPIO_TypeDef * port, int pin) {
+	port->BSRR = 1 << (pin+16);
+}
+
 void gpio_set(GPIO_TypeDef * port, int pin, int value) {
 	if (value) {
-		port->BSRR = 1 << pin; 
+		gpio_high(port, pin);
 	} else {
-		port->BSRR = 1 << (pin+16); 
+		gpio_low(port, pin);
 	}
 }
 
@@ -136,14 +144,6 @@ int gpio_read(GPIO_TypeDef * port, int pin) {
 	} else {
 		return 0;
 	}
-}
-
-void gpio_high(GPIO_TypeDef * port, int pin) {
-	port->BSRR = 1 << pin; 
-}
-
-void gpio_low(GPIO_TypeDef * port, int pin) {
-	port->BSRR = 1 << (pin+16);
 }
 
 void op_led_a(int value) {
