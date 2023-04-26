@@ -175,15 +175,23 @@ void op_led_dx(int pin, int value) {
 	gpio_set(GPIOD, pin, value);
 }
 
+void softi2c_line_mode(GPIO_TypeDef * port, int pin, bool deassert_line) {
+	if (deassert_line) {
+		port->MODER &= ~(0x3 << (pin*2)); 
+	} else {
+		port->MODER = (port->MODER & ~(0x3 << (pin*2))) | (1 << pin*2); 
+	}
+}
+
 void softi2c_init_pins(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port, int sda_pin) {
-	scl_port->OTYPER = (scl_port->OTYPER & ~(1 << scl_pin)) | (1 << scl_pin); // open drain 
-	sda_port->OTYPER = (sda_port->OTYPER & ~(1 << sda_pin)) | (1 << sda_pin); 
+	scl_port->OTYPER = (scl_port->OTYPER & ~(1 << scl_pin)) | (0 << scl_pin); // push pull 
+	sda_port->OTYPER = (sda_port->OTYPER & ~(1 << sda_pin)) | (0 << sda_pin); 
 	scl_port->OSPEEDR = (scl_port->OSPEEDR & ~(0x3 << (scl_pin*2))) | (3 << scl_pin*2); // very high speed 
 	sda_port->OSPEEDR = (sda_port->OSPEEDR & ~(0x3 << (sda_pin*2))) | (3 << sda_pin*2); 
-	scl_port->BSRR = 1 << scl_pin; // default high 
-	sda_port->BSRR = 1 << sda_pin;
-	scl_port->MODER = (scl_port->MODER & ~(0x3 << (scl_pin*2))) | (1 << scl_pin*2); // output 
-	sda_port->MODER = (sda_port->MODER & ~(0x3 << (sda_pin*2))) | (1 << sda_pin*2); 
+	scl_port->BSRR = 1 << (scl_pin + 16); // drive low when asserted 
+	sda_port->BSRR = 1 << (sda_pin + 16);
+	softi2c_line_mode(scl_port, scl_pin, 1); 
+	softi2c_line_mode(sda_port, sda_pin, 1); 
 }
 
 void softi2c_delay() {
@@ -191,77 +199,77 @@ void softi2c_delay() {
 }
 
 void softi2c_sig_start(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port, int sda_pin) {
-	gpio_set(scl_port, scl_pin, 1);
-	gpio_set(sda_port, sda_pin, 1);
+	softi2c_line_mode(scl_port, scl_pin, 1);
+	softi2c_line_mode(sda_port, sda_pin, 1);
 	softi2c_delay(); softi2c_delay();
-	gpio_set(sda_port, sda_pin, 0);
+	softi2c_line_mode(sda_port, sda_pin, 0);
 	softi2c_delay(); softi2c_delay();
-	gpio_set(scl_port, scl_pin, 0);
+	softi2c_line_mode(scl_port, scl_pin, 0);
 	softi2c_delay(); 
 }
 
 void softi2c_sig_repeated_start(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port, int sda_pin) {
-	gpio_set(scl_port, scl_pin, 0);
-	gpio_set(sda_port, sda_pin, 1);
+	softi2c_line_mode(scl_port, scl_pin, 0);
+	softi2c_line_mode(sda_port, sda_pin, 1);
 	softi2c_delay();
-	gpio_set(scl_port, scl_pin, 1);
+	softi2c_line_mode(scl_port, scl_pin, 1);
 	softi2c_delay(); softi2c_delay();
-	gpio_set(sda_port, sda_pin, 0);
+	softi2c_line_mode(sda_port, sda_pin, 0);
 	softi2c_delay(); softi2c_delay();
-	gpio_set(scl_port, scl_pin, 0);
+	softi2c_line_mode(scl_port, scl_pin, 0);
 	softi2c_delay(); 
 }
 
 void softi2c_sig_stop(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port, int sda_pin) {
-	gpio_set(scl_port, scl_pin, 0);
-	gpio_set(sda_port, sda_pin, 0);
+	softi2c_line_mode(scl_port, scl_pin, 0);
+	softi2c_line_mode(sda_port, sda_pin, 0);
 	softi2c_delay(); softi2c_delay();
-	gpio_set(scl_port, scl_pin, 1);
+	softi2c_line_mode(scl_port, scl_pin, 1);
 	softi2c_delay(); softi2c_delay();
-	gpio_set(sda_port, sda_pin, 1);
+	softi2c_line_mode(sda_port, sda_pin, 1);
 	softi2c_delay(); 
 }
 
 void softi2c_send8(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port, int sda_pin, int data8) {
 	for (int i = 0; i < 8; i++) {
-		gpio_set(scl_port, scl_pin, 0);
+		softi2c_line_mode(scl_port, scl_pin, 0);
 		softi2c_delay();
-		gpio_set(sda_port, sda_pin, (data8 << i) & (1 << 7));
+		softi2c_line_mode(sda_port, sda_pin, (data8 << i) & (1 << 7));
 		softi2c_delay(); 
-		gpio_set(scl_port, scl_pin, 1);
+		softi2c_line_mode(scl_port, scl_pin, 1);
 		softi2c_delay(); softi2c_delay();
 	}
 }
 
 int softi2c_read8(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port, int sda_pin) {
 	int data = 0; 
-	gpio_set(sda_port, sda_pin, 1);
+	softi2c_line_mode(sda_port, sda_pin, 1);
 	for (int i = 0; i < 8; i++) {
-		gpio_set(scl_port, scl_pin, 0);
+		softi2c_line_mode(scl_port, scl_pin, 0);
 		softi2c_delay();
 		data |= gpio_read(sda_port, sda_pin) << (7-i);
 		softi2c_delay(); 
-		gpio_set(scl_port, scl_pin, 1);
+		softi2c_line_mode(scl_port, scl_pin, 1);
 		softi2c_delay(); softi2c_delay();
 	}
 	return data;
 }
 
 void softi2c_send_nack(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port, int sda_pin) {
-	gpio_set(scl_port, scl_pin, 0);
+	softi2c_line_mode(scl_port, scl_pin, 0);
 	softi2c_delay();
-	gpio_set(sda_port, sda_pin, 1);
+	softi2c_line_mode(sda_port, sda_pin, 1);
 	softi2c_delay(); 
-	gpio_set(scl_port, scl_pin, 1);
+	softi2c_line_mode(scl_port, scl_pin, 1);
 	softi2c_delay(); 
 }
 
 int softi2c_read_nack(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port, int sda_pin) {
-	gpio_set(scl_port, scl_pin, 0);
+	softi2c_line_mode(scl_port, scl_pin, 0);
 	softi2c_delay();
-	gpio_set(sda_port, sda_pin, 1);
+	softi2c_line_mode(sda_port, sda_pin, 1);
 	softi2c_delay(); 
-	gpio_set(scl_port, scl_pin, 1);
+	softi2c_line_mode(scl_port, scl_pin, 1);
 	softi2c_delay(); 
 	int nack = gpio_read(sda_port, sda_pin);
 	softi2c_delay();
