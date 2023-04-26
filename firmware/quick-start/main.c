@@ -67,34 +67,6 @@ void init_clocks() {
 	core_MHz = 80;
 }
 
-int systick_time = 0; 
-int heartbeat_counter = 0;
-void SysTick_Handler() {
-	systick_time++;
-	
-	// use d7 to d0 to display system time 
-//	GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | (systick_time >> 4) & 0xFF; 
-	
-	// heartbeat led 
-	if (!(systick_time % 1000)) {
-		heartbeat_counter = 100;
-	}
-	if (heartbeat_counter) {
-		GPIOE->BSRR = 1 << 2; 
-		heartbeat_counter--;
-	} else {
-		GPIOE->BSRR = 1 << (2+16); 
-	}
-}
-
-void init_nvic() {
-	__disable_irq();
-	SysTick->LOAD = core_MHz/8*1000; // configure for 1 ms period, use AHB/8 
-	SysTick->CTRL = 0x3; // use AHB/8 as input clock, enable interrupts and counter 
-	NVIC_EnableIRQ(SysTick_IRQn);
-	__enable_irq();
-}
-
 void init_gpio() {
 	PWR->CR2 |= 1 << 9; // enable VDDIO2 supply for GPIOG 
 	// wait until each GPIO is clocked and ready 
@@ -175,6 +147,44 @@ void op_led_dx(int pin, int value) {
 	gpio_set(GPIOD, pin, value);
 }
 
+int systick_time = 0; 
+int heartbeat_counter = 0;
+int ag_counter = 0;
+void SysTick_Handler() {
+	systick_time++;
+	
+	// use d7 to d0 to display system time 
+//	GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | (systick_time >> 4) & 0xFF; 
+	
+	// heartbeat led 
+	if (!(systick_time % 1000)) {
+		heartbeat_counter = 100;
+	}
+	if (!(systick_time % 250)) {
+		ag_counter = 10;
+	}
+	if (heartbeat_counter) {
+		op_led_hb(1);
+		heartbeat_counter--;
+	} else {
+		op_led_hb(0);
+	}
+	if (ag_counter) {
+		op_led_ag(1);
+		ag_counter--;
+	} else {
+		op_led_ag(0);
+	}
+}
+
+void init_nvic() {
+	__disable_irq();
+	SysTick->LOAD = core_MHz/8*1000; // configure for 1 ms period, use AHB/8 
+	SysTick->CTRL = 0x3; // use AHB/8 as input clock, enable interrupts and counter 
+	NVIC_EnableIRQ(SysTick_IRQn);
+	__enable_irq();
+}
+
 void softi2c_line_mode(GPIO_TypeDef * port, int pin, bool deassert_line) {
 	if (deassert_line) {
 		port->MODER &= ~(0x3 << (pin*2)); 
@@ -183,7 +193,7 @@ void softi2c_line_mode(GPIO_TypeDef * port, int pin, bool deassert_line) {
 	}
 }
 
-void softi2c_init_pins(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port, int sda_pin) {
+void init_softi2c(GPIO_TypeDef * scl_port, int scl_pin, GPIO_TypeDef * sda_port, int sda_pin) {
 	scl_port->OTYPER = (scl_port->OTYPER & ~(1 << scl_pin)) | (0 << scl_pin); // push pull 
 	sda_port->OTYPER = (sda_port->OTYPER & ~(1 << sda_pin)) | (0 << sda_pin); 
 	scl_port->OSPEEDR = (scl_port->OSPEEDR & ~(0x3 << (scl_pin*2))) | (3 << scl_pin*2); // very high speed 
@@ -353,6 +363,18 @@ void init_adc() {
 #define IMU_FS_2000_dps 	12 
 #define IMU_FS_4000_dps 	1 
 
+#define MAG_ODR_OFF 		0 
+#define MAG_ODR_10_Hz 		1 
+#define MAG_ODR_50_Hz 		2 
+#define MAG_ODR_100_Hz 		3 
+#define MAG_ODR_200_Hz		4 
+#define MAG_FS_2_G 			0 // btw: "G" is not a typo, it stands for gauss 
+#define MAG_FS_8_G	 		1 
+#define MAG_OVERSAMPLE_512 	0 
+#define MAG_OVERSAMPLE_256 	1 
+#define MAG_OVERSAMPLE_128 	2 
+#define MAG_OVERSAMPLE_64  	3 
+
 void op1_imu_acel_ctrl(int acel_rate, int acel_scale, int digital_filter_on) {
 	acel_rate &= 0xFF;
 	acel_scale &= 0xF;
@@ -403,6 +425,39 @@ int16_t op1_imu_read_temp() {
 	return softi2c_read_reg_hl(OP1_I2C2, IMU_ADDR, 0x21, 0x20);
 }
 
+void op1_mag_ctrl(int rate, int scale, int oversample) {
+	if (rate) {
+		softi2c_write_reg(OP1_I2C2, MAG_ADDR, 0x09, oversample << 6 | scale << 4 | (rate-1) << 2 | 1); 
+	} else {
+		softi2c_write_reg(OP1_I2C2, MAG_ADDR, 0x09, 0);
+	}
+}
+
+void op1_mag_init(int rate, int scale, int oversample) {
+	softi2c_write_reg(OP1_I2C2, MAG_ADDR, 0x0A, 0x80); // soft reset 
+	nop(50); 
+	softi2c_write_reg(OP1_I2C2, MAG_ADDR, 0x0A, 0x00); 
+	softi2c_write_reg(OP1_I2C2, MAG_ADDR, 0x0B, 1);
+	nop(50); 
+	op1_mag_ctrl(rate, scale, oversample);
+}
+
+int16_t op1_mag_read_x() {
+	return softi2c_read_reg_hl(OP1_I2C2, MAG_ADDR, 0x01, 0x00);
+}
+
+int16_t op1_mag_read_y() {
+	return softi2c_read_reg_hl(OP1_I2C2, MAG_ADDR, 0x03, 0x02);
+}
+
+int16_t op1_mag_read_z() {
+	return softi2c_read_reg_hl(OP1_I2C2, MAG_ADDR, 0x05, 0x04);
+}
+
+int16_t op1_mag_read_temp() {
+	return softi2c_read_reg_hl(OP1_I2C2, MAG_ADDR, 0x08, 0x07);
+}
+
 unsigned int abs16(int16_t a) {
 	if (a < 0) {
 		return (a * -1);
@@ -413,32 +468,57 @@ unsigned int abs16(int16_t a) {
 
 int main() {
 	init_clocks();
-	init_nvic();
 	init_gpio();
-	softi2c_init_pins(OP1_I2C2);
+	init_nvic();
+	init_softi2c(OP1_I2C2);
 	
-	softi2c_write_reg(OP1_I2C2, MAG_ADDR, 0x0B, 0x01);  
-	softi2c_write_reg(OP1_I2C2, MAG_ADDR, 0x09, 0x1D); 
-	softi2c_read_reg(OP1_I2C2, MAG_ADDR, 0x08); // temp high byte 
-	softi2c_read_reg(OP1_I2C2, MAG_ADDR, 0x07); // temp low byte 
-
-	// while(1) { 
-	// 	op_led_c(!gpio_read(GPIOB, 11));
-	// 	nop(10000);
-	// 	int temp = (softi2c_read_reg(OP1_I2C2, MAG_ADDR, 0x08) << 8) | softi2c_read_reg(OP1_I2C2, MAG_ADDR, 0x07);
-	// 	GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | (temp>>3) & 0xFF;
-	// }
-
+	op1_mag_init(MAG_ODR_200_Hz, MAG_FS_8_G, MAG_OVERSAMPLE_512);
 	op1_imu_init(IMU_ODR_3333_Hz, IMU_FS_2_g, IMU_ODR_3333_Hz, IMU_FS_1000_dps);
+
+	int state = 0;
+	int btn_debounce = 0;
+
+	while(1) { 
+		op_led_c(!gpio_read(GPIOB, 11));
+		
+		if ((!gpio_read(GPIOB, 10))&&(!btn_debounce)) {
+			state = (state + 1) % 5;
+			btn_debounce = 100;
+		} else if (btn_debounce) {
+			btn_debounce--;
+		}
+		
+		switch (state) {
+			case 0: 
+				GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | (op1_imu_read_acel_x()>>8) & 0xFF;
+				op_led_a(1);
+				op_led_b(systick_time & 1 << 6);
+				break; 
+			case 1: 
+				GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | (abs16(op1_imu_read_gyro_z())>>8) & 0xFF;
+				op_led_a(0);
+				op_led_a(1);
+				break; 
+			default: 
+				op_led_a(0);
+				op_led_b(0);
+				break; 
+		}
+		nop(100000);
+	}
 
 	while(1) { // blinky 
 		op_led_c(!gpio_read(GPIOB, 11));
-		nop(100000);
+		nop(1000000);
 		int16_t ax = op1_imu_read_acel_x();
 		int16_t ay = op1_imu_read_acel_y();
 		int16_t az = op1_imu_read_acel_z();
 		int amag = sqrt(ax^2 + ay^2 + az^2);
-		int value = abs16(op1_imu_read_gyro_z()) >> 8; 
+		int value;
+		value = abs16(op1_imu_read_gyro_z()) >> 8; 
+		value = op1_mag_read_x();
+		value = op1_mag_read_temp();
+		value = value >> 8;
 		GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | value & 0xFF;
 	}
 }
