@@ -4,17 +4,17 @@
 
 Integrated flight systems board with flight controller, avionics & instrumentation, radio, science, and development support for UC Davis Space and Satellite Systems REALOP-1 mission.
 
-Featured chips:  
+Featured chips: (Many ~~chips~~ are removed for Revision 2. See below.)
  - STM32L476ZGT3 (microcontroller)
  - ASM330LHH (inertial sensor)
  - QMC5883L (magnetometer)
- - ADF7021 (radio front end) 
- - TQP7M9102 (power amplifier) 
- - SKY13453 (rf switch)
- - MAX2208 (rf power detector) 
+ - ~~ADF7021 (radio front end)~~ 
+ - ~~TQP7M9102 (power amplifier)~~ 
+ - ~~SKY13453 (rf switch)~~
+ - ~~MAX2208 (rf power detector)~~ 
  - W25Q128JVSIQ (flash memory) 
  - MB85RS256B (ferroelectric memory)
- - TMP235 (analog temperature sensor) 
+ - ~~TMP235 (analog temperature sensor)~~ 
 
 ## Documentation:
 
