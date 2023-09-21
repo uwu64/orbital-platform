@@ -30,3 +30,25 @@ For now we're using the Keil SDK for compiling the program, but the `gcc-arm-non
 -fno-rtti -funsigned-char -fshort-enums -fshort-wchar`
 
 The compiled program can then be uploaded over SWD using your software of choice.
+
+## Revision 2
+
+Revision 2 hardware of Orbital Platform is in the works. Delivery of initial prototypes scheduled for mid October 2023 ish. 
+
+### Changes 
+- Removed radio system: communication function delegated to the new Orbital Imager 
+- Revised layout to improve routing, manufactuability, and reliabiltiy
+- Inertial sensor (ASM330LHH) is now connected via SPI for reliability
+- Magnetometer (QMC5883L) on its own I2C bus for reliability
+- Addition of JST-GH connectors for
+  - 6x Solar panels (photodiode + thermistor)
+  - 4x Solar panels (pyramid design) 
+  - ESC control via PWM
+  - ESC control via UART
+  - Expansion UART
+- Less LEDs (still a usable amount)
+- Fixed EXTI pins: no overlapping signals
+- Fixed USB FS implementation 
+- Design for manufacturability: reduced cost and BOM lines
+
+
