@@ -31,9 +31,11 @@ For now we're using the Keil SDK for compiling the program, but the `gcc-arm-non
 
 The compiled program can then be uploaded over SWD using your software of choice.
 
+![](pictures/r2-1.jpg)
+
 ## Revision 2
 
-Revision 2 hardware of Orbital Platform is in the works. Delivery of initial prototypes scheduled for mid October 2023 ish. 
+Revision 2 hardware of Orbital Platform is in the verification stage. So far, so good!
 
 ### Changes 
 - Removed radio system: communication function delegated to the new Orbital Imager 
