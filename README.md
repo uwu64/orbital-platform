@@ -48,6 +48,7 @@ Revision 2 hardware of Orbital Platform is in the verification stage. So far, so
   - ESC control via PWM
   - ESC control via UART
   - Expansion UART
+- Addition of pyrotechnic channel to drive antenna deployment meltwire
 - Less LEDs (still a usable amount)
 - Fixed EXTI pins: no overlapping signals
 - Fixed USB FS implementation 
