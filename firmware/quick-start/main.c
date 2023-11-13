@@ -466,6 +466,94 @@ unsigned int abs16(int16_t a) {
 	}
 }
 
+
+// PE13 clock 
+// PE12 latch 
+// PG4 mosi 
+// PF3 PB7 PB6 all go high  
+void mo(int val) {
+	gpio_set(GPIOG, 4, val);
+}
+
+void cl(int val) {
+	gpio_set(GPIOE, 13, val);
+}
+
+void la(int val) {
+	gpio_set(GPIOE, 12, val);
+}
+
+void init_lolspi() {
+	GPIOB->ODR |= 1 << 7 | 1 << 6;
+	GPIOF->ODR |= 1 << 3; 
+	la(1);
+	cl(0);
+	mo(0);
+	
+	GPIOG->MODER = 0x01 << 4*2;
+	GPIOB->MODER = 0x01 << 7*2 | 0x01 << 6*2; 
+	GPIOF->MODER = 0x01 << 3*2;
+	GPIOE->MODER = 0x01 << 13*2 | 0x01 << 12*2; 
+}
+
+void ss() {
+	nop(100);
+}
+
+void w32(int val) {
+	la(0);
+	cl(0);
+	ss();
+	for (int i = 0; i < 32; i++) {
+		mo((val>>(31-i)) & 1);
+		ss();
+		cl(1);
+		ss();
+		cl(0);
+	}
+	la(1);
+	ss(); ss(); ss(); nop(0xFFFF);
+}
+int regsa[] = {
+  0x10BB140,
+  0x575011,  
+  0x3DD082,
+  0x2B149923,
+  0x80493814,
+  0x03FF5,
+  0x50C78C6,
+  0x007,
+
+  0x0008,
+  0x231E9,
+  0x3296286A,
+  0x0003B,
+  0x0010C,
+  0x0000D,
+  0x0000000E,
+  0x0000050F
+};
+
+int regs[] = {
+  0x10bb140,
+  0x21b56a1,
+  0x533082,
+  0x2bfc89a3,
+  0x80587a14,
+  0x03FF5,
+  0x50C78C6,
+  0x007,
+
+  0x0008,
+  0x231E9,
+  0x3296286A,
+  0x0003B,
+  0x0010C,
+  0x0000D,
+  0x0000000E,
+  0x0000050F
+};
+
 int main() {
 	init_clocks();
 	init_gpio();
@@ -478,7 +566,25 @@ int main() {
 	int state = 0;
 	int btn_debounce = 0;
 
-	while(1) { 
+
+
+	while (0) { // radio attempt 
+		init_lolspi();
+		nop(0xFFF);
+		w32(regs[1]); 
+    w32(regs[3]);
+    w32(regs[0]);
+    w32(regs[4]);
+    w32(regs[2]); 
+
+    w32(regs[15]);
+		nop(0xFFFFFF);nop(0xFFFFFF);nop(0xFFFFFF);nop(0xFFFFFF);nop(0xFFFFFF);nop(0xFFFFFF);nop(0xFFFFFF);
+
+	}
+
+
+
+	while(1) { // test program 
 		op_led_c(!gpio_read(GPIOB, 11));
 		
 		if ((!gpio_read(GPIOB, 10))&&(!btn_debounce)) {
@@ -489,15 +595,20 @@ int main() {
 		}
 		
 		switch (state) {
-			case 0: 
+			case 0: // imu (tilt)
 				GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | (op1_imu_read_acel_x()>>8) & 0xFF;
 				op_led_a(1);
 				op_led_b(systick_time & 1 << 6);
 				break; 
-			case 1: 
+			case 1: // gyro 
 				GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | (abs16(op1_imu_read_gyro_z())>>8) & 0xFF;
 				op_led_a(0);
+				op_led_b(1);
+				break; 
+			case 2: // noisy gyro.. 
+				GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | (abs16(op1_imu_read_gyro_z())) & 0xFF;
 				op_led_a(1);
+				op_led_b(0);
 				break; 
 			default: 
 				op_led_a(0);
@@ -507,7 +618,7 @@ int main() {
 		nop(100000);
 	}
 
-	while(1) { // blinky 
+	while(1) { // just blinky 
 		op_led_c(!gpio_read(GPIOB, 11));
 		nop(1000000);
 		int16_t ax = op1_imu_read_acel_x();
@@ -521,6 +632,13 @@ int main() {
 		value = value >> 8;
 		GPIOD->ODR = (GPIOD->ODR & 0xFFFFFF00) | value & 0xFF;
 	}
+	
+	
+	
+	
+	
+	
+	
 }
 
 
