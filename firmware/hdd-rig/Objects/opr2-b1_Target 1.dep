@@ -1,0 +1,24 @@
+Dependencies for Project 'opr2-b1', Target 'Target 1': (DO NOT MODIFY !)
+CompilerVersion: 6160000::V6.16::ARMCLANG
+F (.\main.c)(0x65501B98)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-3 -O1 -ffunction-sections -w-I./RTE/_Target_1-IC:/Users/Syntax/AppData/Local/Arm/Packs/ARM/CMSIS/5.9.0/CMSIS/Core/Include-IC:/Users/Syntax/AppData/Local/Arm/Packs/Keil/STM32L4xx_DFP/2.6.2/Drivers/CMSIS/Device/ST/STM32L4xx/Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32L476xx -D_RTE_-o ./objects/main.o -MD)
+I (C:\Users\Syntax\AppData\Local\Arm\Packs\Keil\STM32L4xx_DFP\2.6.2\Drivers\CMSIS\Device\ST\STM32L4xx\Include\stm32l476xx.h)(0x60F04648)
+I (C:\Users\Syntax\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include\core_cm4.h)(0x62701DCE)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60367798)
+I (C:\Users\Syntax\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include\cmsis_version.h)(0x62701DCE)
+I (C:\Users\Syntax\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include\cmsis_compiler.h)(0x62701DCE)
+I (C:\Users\Syntax\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include\cmsis_armclang.h)(0x62701DCE)
+I (C:\Users\Syntax\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include\mpu_armv7.h)(0x62701DCE)
+I (C:\Users\Syntax\AppData\Local\Arm\Packs\Keil\STM32L4xx_DFP\2.6.2\Drivers\CMSIS\Device\ST\STM32L4xx\Include\system_stm32l4xx.h)(0x60F04648)
+I (C:\Keil_v5\ARM\ARMCLANG\include\math.h)(0x60367798)
+I (C:\Keil_v5\ARM\ARMCLANG\include\string.h)(0x60367798)
+F (RTE\Device\STM32L476ZGTx\startup_stm32l476xx.s)(0x60F04648)(--target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -masm=auto -c-gdwarf-3-I./RTE/_Target_1-IC:/Users/Syntax/AppData/Local/Arm/Packs/ARM/CMSIS/5.9.0/CMSIS/Core/Include-IC:/Users/Syntax/AppData/Local/Arm/Packs/Keil/STM32L4xx_DFP/2.6.2/Drivers/CMSIS/Device/ST/STM32L4xx/Include-Wa,armasm,--pd,"__UVISION_VERSION SETA 534" -Wa,armasm,--pd,"_RTE_ SETA 1" -Wa,armasm,--pd,"STM32L476xx SETA 1" -Wa,armasm,--pd,"_RTE_ SETA 1"-o ./objects/startup_stm32l476xx.o)
+F (RTE\Device\STM32L476ZGTx\system_stm32l4xx.c)(0x60F04648)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-3 -O1 -ffunction-sections -w-I./RTE/_Target_1-IC:/Users/Syntax/AppData/Local/Arm/Packs/ARM/CMSIS/5.9.0/CMSIS/Core/Include-IC:/Users/Syntax/AppData/Local/Arm/Packs/Keil/STM32L4xx_DFP/2.6.2/Drivers/CMSIS/Device/ST/STM32L4xx/Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32L476xx -D_RTE_-o ./objects/system_stm32l4xx.o -MD)
+I (C:\Users\Syntax\AppData\Local\Arm\Packs\Keil\STM32L4xx_DFP\2.6.2\Drivers\CMSIS\Device\ST\STM32L4xx\Include\stm32l4xx.h)(0x60F04648)
+I (C:\Users\Syntax\AppData\Local\Arm\Packs\Keil\STM32L4xx_DFP\2.6.2\Drivers\CMSIS\Device\ST\STM32L4xx\Include\stm32l476xx.h)(0x60F04648)
+I (C:\Users\Syntax\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include\core_cm4.h)(0x62701DCE)
+I (C:\Keil_v5\ARM\ARMCLANG\include\stdint.h)(0x60367798)
+I (C:\Users\Syntax\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include\cmsis_version.h)(0x62701DCE)
+I (C:\Users\Syntax\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include\cmsis_compiler.h)(0x62701DCE)
+I (C:\Users\Syntax\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include\cmsis_armclang.h)(0x62701DCE)
+I (C:\Users\Syntax\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include\mpu_armv7.h)(0x62701DCE)
+I (C:\Users\Syntax\AppData\Local\Arm\Packs\Keil\STM32L4xx_DFP\2.6.2\Drivers\CMSIS\Device\ST\STM32L4xx\Include\system_stm32l4xx.h)(0x60F04648)
