@@ -54,4 +54,19 @@ Revision 2 hardware of Orbital Platform is in the verification stage. So far, so
 - Fixed USB FS implementation 
 - Design for manufacturability: reduced cost and BOM lines
 
+# Getting started
 
+Orbital Platform should be delivered to you with a test program flashed, where it blinks the indicator LEDs in a demo pattern. 
+
+To program and debug the MCU, attach a SWD-compatible debugger like ST-LINK, JLINK, or DAPLINK, to the SWD connector near the MCU. 
+| Label | Signal |
+| ------------- | ------------- |
+| 3 | 3.3 V  |
+| G | Ground |
+| C | SWCLK  |
+| D | SWDIO  |
+| R | NRST   |
+
+The reset button is next to the SWD eader, labelled RST. 
+
+Use your toolchain of choice to target the `stm32l476zgt` MCU. 
