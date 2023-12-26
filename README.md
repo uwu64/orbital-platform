@@ -67,6 +67,25 @@ To program and debug the MCU, attach a SWD-compatible debugger like ST-LINK, JLI
 | D | SWDIO  |
 | R | NRST   |
 
-The reset button is next to the SWD eader, labelled RST. 
+The reset button is next to the SWD header, labelled RST. 
 
 Use your toolchain of choice to target the `stm32l476zgt` MCU. 
+
+## Using the Keil MDK (μVision) IDE with DAPLINK debugger
+
+One toolchain that works with developing software for Orbital Platform uses the Keil MDK IDE and DAPLINK debugger dongle, on Windows. 
+- Start by downloading and installing a free version of Keil MDK-ARM (μVision). You should be able to download it after filling out some info on [the download page](https://www.keil.com/demo/eval/arm.htm)
+- Launch the IDE.
+- Find the "Pack Installer" in the top toolbar. It looks like a green diamond shape with four dots inside.
+- Use the Pack Installer to install relevant CMSIS device support packs for `STM32L4 Series`
+- Close Pack Installer. From the top toolbar, use the menu `Project` -> `New μVision Project` to start a new project.
+- When given the option to select target device, choose `STM32L476ZGT`
+- When given the option to manage run time environment, enable `CMSIS -> CORE` and `Device -> Startup`. There may be dependancies highlighted in yellow, enable those too.
+  - Don't enable anything else unless you want to use HAL or something.
+- After creating a new project, open `Options for Target` in the top toolbar. Then go to the `Debug` tab and choose Use `DAPLINK debugger`. No additional configuration should be needed.
+- Connect Orbital Platform to DAPLINK via the SWD port. Plug DAPLINK to your computer.
+  - The DAPLINK should light up, if it doesn't, unplug it from your computer immediately and check your wiring. There might be a short circuit
+- Click `Build` on the top toolbar, then `Load`. Your code should now be compiled and flashed to Orbital Platform. Click `Debug` to launch the debugger.
+
+
+
