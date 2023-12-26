@@ -38,7 +38,7 @@ The compiled program can then be uploaded over SWD using your software of choice
 Revision 2 hardware of Orbital Platform is in the verification stage. So far, so good!
 
 ### Changes 
-- Removed radio system: communication function delegated to the new Orbital Imager 
+- Removed radio system: communication function delegated to the new [Orbital Imager](https://github.com/REALOP-ELEC/Orbital_Imager_LRes) 
 - Revised layout to improve routing, manufactuability, and reliabiltiy
 - Inertial sensor (ASM330LHH) is now connected via SPI for reliability
 - Magnetometer (QMC5883L) on its own I2C bus for reliability
