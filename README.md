@@ -75,6 +75,7 @@ Use your toolchain of choice to target the `stm32l476zgt` MCU.
 
 One toolchain that works with developing software for Orbital Platform uses the Keil MDK IDE and DAPLINK debugger dongle, on Windows. 
 - Start by downloading and installing a free version of Keil MDK-ARM (μVision). You should be able to download it after filling out some info on [the download page](https://www.keil.com/demo/eval/arm.htm)
+  - The free version now seems to be called "MDK-Community" and appears to be a non-commercial but fully featured version of the normal IDE. It used to be that the demo/eval/free version had a very restricted code size. Hope this is no longer the case.
 - Also download and install STM32CubeMX which is ST's initialization code generator and graphical config editor. Scroll down on [this page](https://www.st.com/en/development-tools/stm32cubemx.html) to Get Software. You might need to fill in some info for this as well. 
 - Launch the IDE.
 - Find the "Pack Installer" in the top toolbar. It looks like a green diamond shape with four dots inside.
@@ -90,6 +91,7 @@ One toolchain that works with developing software for Orbital Platform uses the 
   - Choose `C File (.c)` and name it `main.c`
   - You need to `#include <stm32l476xx.h>` to import register definitions.
   - Paste some code from this repository or write some blinky program.
+  - Alternatively, you can git clone or zip download this repository and directly open the Keil project files. Everything should be configured for DAPLINK targeting Orbital Platform.
 - Connect Orbital Platform to DAPLINK via the SWD port. Plug DAPLINK to your computer.
   - The DAPLINK should light up, if it doesn't, unplug it from your computer immediately and check your wiring. There may be a short circuit.
 - Click `Build` on the top toolbar, then `Download`. Your code should now be compiled and flashed to Orbital Platform. Click `Debug` to launch the debugger, or signal a hardware reset to begin execution.
