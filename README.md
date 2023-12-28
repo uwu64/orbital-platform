@@ -87,12 +87,12 @@ One toolchain that works with developing software for Orbital Platform uses the 
 - After creating a new project, open `Options for Target` in the top toolbar. Then go to the `Debug` tab and choose Use `CMSIS-DAP debugger`. No additional configuration should be needed.
   - Or choose whatever debugger you use, like ST-Link or J-Link.
 - In the left side `Project` panel, right click `Source Group 1` and select `Add new Item to Group`
-  - Choose C File `(.c)` and name it `main.c`
+  - Choose `C File (.c)` and name it `main.c`
   - You need to `#include <stm32l476xx.h>` to import register definitions.
-  - Paste some code from this repository or write some blinky.
+  - Paste some code from this repository or write some blinky program.
 - Connect Orbital Platform to DAPLINK via the SWD port. Plug DAPLINK to your computer.
-  - The DAPLINK should light up, if it doesn't, unplug it from your computer immediately and check your wiring. There might be a short circuit
-- Click `Build` on the top toolbar, then `Load`. Your code should now be compiled and flashed to Orbital Platform. Click `Debug` to launch the debugger.
+  - The DAPLINK should light up, if it doesn't, unplug it from your computer immediately and check your wiring. There may be a short circuit.
+- Click `Build` on the top toolbar, then `Download`. Your code should now be compiled and flashed to Orbital Platform. Click `Debug` to launch the debugger, or signal a hardware reset to begin execution.
 
 
 
