@@ -84,7 +84,8 @@ One toolchain that works with developing software for Orbital Platform uses the 
 - When given the option to manage run time environment, enable `CMSIS -> CORE`, `Device -> Startup`, `Device -> STM32Cube HAL`. There may be dependancies highlighted in yellow, enable those too.
   - Also enable `Device -> STM32Cube Framework (API) -> STM32CubeMX`. If it requires you to press the button to launch CubeMX, do it. Try to proceed with default settings in CubeMX because we don't intend to use any generated code.
   - Don't enable anything else unless you want to use full HAL or other middleware.
-- After creating a new project, open `Options for Target` in the top toolbar. Then go to the `Debug` tab and choose Use `DAPLINK debugger`. No additional configuration should be needed.
+- After creating a new project, open `Options for Target` in the top toolbar. Then go to the `Debug` tab and choose Use `CMSIS-DAP debugger`. No additional configuration should be needed.
+  - Or choose whatever debugger you use, like ST-Link or J-Link.
 - In the left side `Project` panel, right click `Source Group 1` and select `Add new Item to Group`
   - Choose C File `(.c)` and name it `main.c`
   - You need to `#include <stm32l476xx.h>` to import register definitions.
