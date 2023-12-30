@@ -54,6 +54,18 @@ Revision 2 hardware of Orbital Platform is in the verification stage. So far, so
 - Fixed USB FS implementation 
 - Design for manufacturability: reduced cost and BOM lines
 
+## Revision 3
+
+Revision 3 is in the planning stage, no specific design element has been decided. 
+
+Some themes and guidelines for Revision 3:
+- Keep software compatibility with R2. Remap a minimal number of pins and don't change existing peripherals.
+- Further improve manufacturability.
+- Possibly introduce additional features
+  - More connectors: Coils, panel temperature sensors, etc.
+  - More sensors: High precision temperature sensor, and digitizer for additional thermistors or sensors
+- Mechanical adjustments to meet any changes to structures, and possible compatibility with High Altitude Balloon project
+
 # Getting started
 
 Orbital Platform should be delivered to you with a test program flashed, where it blinks the indicator LEDs in a demo pattern. 
