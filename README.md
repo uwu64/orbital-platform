@@ -65,6 +65,7 @@ Some themes and guidelines for Revision 3:
   - More connectors: Coils, panel temperature sensors, etc.
   - More sensors: High precision temperature sensor, and digitizer for additional thermistors or sensors
 - Mechanical adjustments to meet any changes to structures, and possible compatibility with High Altitude Balloon project
+- Direct battery voltage measurement
 
 # Getting started
 
