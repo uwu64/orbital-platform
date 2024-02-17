@@ -68,6 +68,10 @@ Some themes and guidelines for Revision 3:
 - Direct battery voltage measurement 
 - Current sensor and power switches for ADCS science and experiment payloads
 
+Errata: a few things need to be fixed 
+- Re-pour copper planes to fix two shorted vias
+- Correct the direction of the PMOS high side switch for the pyro/antenna deployment heater 
+
 Related electrical team design tasks: 
 - Three channel constant current driver for magnetorquer 
 
