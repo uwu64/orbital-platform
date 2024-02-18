@@ -67,6 +67,7 @@ Some themes and guidelines for Revision 3:
 - Mechanical adjustments to meet any changes to structures, and possible compatibility with High Altitude Balloon project 
 - Direct battery voltage measurement 
 - Current sensor and power switches for ADCS science and experiment payloads
+- Another redundant set of avionics (IMU and mag) for good vibes. IMU does not need to be at dead center of board anymore
 
 Errata: a few things need to be fixed 
 - Re-pour copper planes to fix two shorted vias
