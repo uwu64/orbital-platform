@@ -58,11 +58,13 @@ Revision 2 hardware of Orbital Platform is in the verification stage. So far, so
 
 ## Revision 3
 
-Revision 3 is in the planning stage, no specific design element has been decided. 
+Revision 3 is in the planning stage, most design choices are still undecided. 
 
 Some themes and guidelines for Revision 3: 
 - Keep software compatibility with R2. Remap a minimal number of pins and don't change existing peripherals. 
-- Further improve manufacturability. 
+- Further improve manufacturability.
+- Include radio system (Orbital Imager will be deprecated)
+  - Relatedly, we need a new camera interface port. Likely UART or SPI
 - Possibly introduce additional features 
   - More connectors: Coils, panel temperature sensors, etc. 
   - More sensors: High precision temperature sensor, and digitizer for additional thermistors or sensors 
