@@ -79,7 +79,25 @@ Errata: a few things need to be fixed
 - Correct the direction of the PMOS high side switch for the pyro/antenna deployment heater 
 
 Related electrical team design tasks: 
-- Three channel constant current driver for magnetorquer 
+- Three channel constant current driver for magnetorquer
+- Hard disk drive motor driver
+
+Inter-board connector list for Rev 3
+| Mnemonic | Multiplicity | Connector type | Purpose |
+| ------------- | ------------- | ------------- | ------------- |
+| esc | 1 | ? | HDD driver speed command and feedback |
+| coil | 1 (3 axis) | ? | Magnetorquer driver control signal and I V feedback |
+| sol | 4-6 | ? | Sun sensor photodiodes and outer panel thermistors |
+| mbat | 1 | JST-PH-4 (?) | Satellite main battery |
+| cam | 1 | ? | Imaging system data connection | 
+| pyro | 1 | JST-PH-4 (?) | Antenna melt-wire deployer |
+| pv | 4 | ? | Photovoltaic cell (solar panel) power input from each panel |
+| inst | 1-2 | ? | Auxiliary instrumentation bus (I2C) for remote ADCs |
+| service | 1 | ? | Ground diagnostic and firmware service port (SWD, UART) | 
+| topoff | 1 | ? | Ground battery top-off charging port |
+| rbf | 1 | ? | Remove before flight safety interlock |
+| aux | 1-4 | Auxillary UART/I2C/SPI ports | 
+| usb | 1 | ? | Ground use USB port |
 
 # Getting started
 
