@@ -96,8 +96,11 @@ Inter-board connector list for Rev 3
 | service | 1 | ? | Ground diagnostic and firmware service port (SWD, UART) | 
 | topoff | 1 | ? | Ground battery top-off charging port |
 | rbf | 1 | ? | Remove before flight safety interlock |
-| aux | 1-4 | Auxillary UART/I2C/SPI ports | 
-| usb | 1 | ? | Ground use USB port |
+| aux | 1-4 | ? | Auxillary UART/I2C/SPI ports | 
+| usb | 1 | USB Micro-B | Ground use USB port |
+| trx | 1 | MMCX | Antenna coaxial RF connection to radio system |
+
+(Service and Topoff ports could be combined into "umbilical" port?)
 
 # Getting started
 
