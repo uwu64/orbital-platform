@@ -120,6 +120,9 @@ The reset button is next to the SWD header, labelled RST.
 
 Use your toolchain of choice to target the `stm32l476zgt` MCU. 
 
+## Using the gcc-arm-none-eabi toolchain and pyocd with DAPLINK debugger
+I personally prefer to use a very minimal environment for prototyping firmware. See the [template project here](https://github.com/uwu64/cg3-stm32l476)
+
 ## Using the Keil MDK (μVision) IDE with DAPLINK debugger
 
 One toolchain that works with developing software for Orbital Platform uses the Keil MDK IDE and DAPLINK debugger dongle, on Windows. 
