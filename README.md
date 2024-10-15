@@ -1,4 +1,4 @@
-![](pictures/r1-1.jpg)
+![](pictures/opr3-1.JPG)
 
 # Orbital Platform
 
@@ -56,9 +56,13 @@ Revision 2 hardware of Orbital Platform is in the verification stage. So far, so
 - Fixed USB FS implementation 
 - Design for manufacturability: reduced cost and BOM lines
 
+![](pictures/r1-1.jpg)
+
+![](pictures/opr3-2.JPG)
+
 ## Revision 3
 
-Revision 3 is in the planning stage, most design choices are still undecided. 
+Revision 3 is in the validation stage, with many changes and additions. 
 
 Some themes and guidelines for Revision 3: 
 - Keep software compatibility with R2. Remap a minimal number of pins and don't change existing peripherals. 
