@@ -20,6 +20,8 @@ Featured chips: (Many ~~chips~~ are removed for Revision 2. See below.)
 
 For an overview of the project, some FAQs, and links to some other documentation, see the [Cattleworks Compendium](https://docs.google.com/document/d/1Hi_DiSkjC-WS4wI39fk3itqsipQI5O-aAOiK9zkmOj8/edit#)
 
+Pinout and usage information of Revision 3 can be found in the [OPR3 Reference Manual](https://docs.google.com/document/d/1Jm04JslQRQYXkw6q29EbMsp4aHQEIRqEN40WjQPSD0c/edit?usp=sharing)
+
 Other useful documents include
 - [STM32L47xxx reference manual](https://www.st.com/resource/en/reference_manual/rm0351-stm32l47xxx-stm32l48xxx-stm32l49xxx-and-stm32l4axxx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)
 - [STM32L476xx datasheet](https://www.st.com/resource/en/datasheet/stm32l476zg.pdf)
@@ -32,31 +34,6 @@ For now we're using the Keil SDK for compiling the program, but the `gcc-arm-non
 -fno-rtti -funsigned-char -fshort-enums -fshort-wchar`
 
 The compiled program can then be uploaded over SWD using your software of choice.
-
-![](pictures/r2-1.jpg)
-
-## Revision 2
-
-Revision 2 hardware of Orbital Platform is in the verification stage. So far, so good!
-
-### Changes 
-- Removed radio system: communication function delegated to the new [Orbital Imager](https://github.com/REALOP-ELEC/Orbital_Imager_LRes) 
-- Revised layout to improve routing, manufactuability, and reliabiltiy
-- Inertial sensor (ASM330LHH) is now connected via SPI for reliability
-- Magnetometer (QMC5883L) on its own I2C bus for reliability
-- Addition of JST-GH connectors for
-  - 6x Solar panels (photodiode + thermistor)
-  - 4x Solar panels (pyramid design) 
-  - ESC control via PWM
-  - ESC control via UART
-  - Expansion UART
-- Addition of pyrotechnic channel to drive antenna deployment meltwire
-- Less LEDs (still a usable amount)
-- Fixed EXTI pins: no overlapping signals
-- Fixed USB FS implementation 
-- Design for manufacturability: reduced cost and BOM lines
-
-![](pictures/r1-1.jpg)
 
 ![](pictures/opr3-2.JPG)
 
@@ -91,22 +68,51 @@ Related electrical team design tasks:
 Inter-board connector list for Rev 3
 | Mnemonic | Multiplicity | Connector type | Purpose |
 | ------------- | ------------- | ------------- | ------------- |
-| esc | 1 | ? | HDD driver speed command and feedback |
-| coil | 1 (3 axis) | ? | Magnetorquer driver control signal and I V feedback |
-| sol | 4-6 | ? | Sun sensor photodiodes and outer panel thermistors |
-| mbat | 1 | JST-PH-4 (?) | Satellite main battery |
-| cam | 1 | ? | Imaging system data connection | 
-| pyro | 1 | JST-PH-4 (?) | Antenna melt-wire deployer |
-| pv | 4 | ? | Photovoltaic cell (solar panel) power input from each panel |
-| inst | 1-2 | ? | Auxiliary instrumentation bus (I2C) for remote ADCs |
-| service | 1 | ? | Ground diagnostic and firmware service port (SWD, UART) | 
-| topoff | 1 | ? | Ground battery top-off charging port |
-| rbf | 1 | ? | Remove before flight safety interlock |
-| aux | 1-4 | ? | Auxillary UART/I2C/SPI ports | 
-| usb | 1 | USB Micro-B | Ground use USB port |
+| esc | 1 | Picoblade 4 pin | HDD driver speed command and feedback |
+| coil | 1 (3 axis) | Picoblade 4 pin | Magnetorquer driver control signal and I V feedback |
+| sol | 4-6 | Picoblade 8 pin | Sun sensor photodiodes and outer panel thermistors |
+| mbat | 1 | Picoblade 8 pin | Satellite main battery |
+| cam | 1 | Picoblade 8 pin | Imaging system data connection | 
+| pyro | 1 | Picoblade 4 pin | Antenna melt-wire deployer |
+| pv | 4 | Picoblade 8 pin | Photovoltaic cell (solar panel) power input from each panel |
+| inst | 1-2 | Picoblade 8 pin | Auxiliary instrumentation bus (I2C) for remote ADCs |
+| service | 1 | JST GH | Ground diagnostic and firmware service port (SWD, UART) | 
+| topoff | 1 | N/A | Ground battery top-off charging port |
+| rbf | 1 | N/A | Remove before flight safety interlock |
+| aux | 1-4 | Picoblade 8 pin | Auxillary UART/I2C/SPI ports | 
+| usb | 1 | USB Type-C | Ground use USB port |
 | trx | 1 | MMCX | Antenna coaxial RF connection to radio system |
 
 (Service and Topoff ports could be combined into "umbilical" port?)
+
+![](pictures/r2-1.jpg)
+
+## Revision 2
+
+Revision 2 hardware of Orbital Platform is in the verification stage. So far, so good!
+
+### Changes 
+- Removed radio system: communication function delegated to the new [Orbital Imager](https://github.com/REALOP-ELEC/Orbital_Imager_LRes) 
+- Revised layout to improve routing, manufactuability, and reliabiltiy
+- Inertial sensor (ASM330LHH) is now connected via SPI for reliability
+- Magnetometer (QMC5883L) on its own I2C bus for reliability
+- Addition of JST-GH connectors for
+  - 6x Solar panels (photodiode + thermistor)
+  - 4x Solar panels (pyramid design) 
+  - ESC control via PWM
+  - ESC control via UART
+  - Expansion UART
+- Addition of pyrotechnic channel to drive antenna deployment meltwire
+- Less LEDs (still a usable amount)
+- Fixed EXTI pins: no overlapping signals
+- Fixed USB FS implementation 
+- Design for manufacturability: reduced cost and BOM lines
+
+![](pictures/r1-1.jpg)
+
+## Revision 1
+
+Revision 1 was the initial prototype that we used to validate whether our choice of components are suited for the application. 
 
 # Getting started
 
