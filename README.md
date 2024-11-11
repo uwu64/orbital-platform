@@ -26,14 +26,10 @@ Other useful documents include
 - [STM32L47xxx reference manual](https://www.st.com/resource/en/reference_manual/rm0351-stm32l47xxx-stm32l48xxx-stm32l49xxx-and-stm32l4axxx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)
 - [STM32L476xx datasheet](https://www.st.com/resource/en/datasheet/stm32l476zg.pdf)
 
-Find flight software IntelliSat developed by the flight software team at [the IntelliSat repository](https://github.com/Space-and-Satellite-Systems-UC-Davis/IntelliSat), including [detailed documentation about widgets and connections](https://github.com/Space-and-Satellite-Systems-UC-Davis/IntelliSat/blob/main/Manuals/OrbitalPlatform_Hardware/OP_Hardware.md). 
+Find IntelliSat developed by the flight software team at [the IntelliSat repository](https://github.com/Space-and-Satellite-Systems-UC-Davis/IntelliSat), including [detailed documentation about widgets and connections](https://github.com/Space-and-Satellite-Systems-UC-Davis/IntelliSat/blob/main/Manuals/OrbitalPlatform_Hardware/OP_Hardware.md). 
 
-### toolchain:
-
-For now we're using the Keil SDK for compiling the program, but the `gcc-arm-none-eabi` toolchain can also be used directly, with the flags (as used by Keil's invocation) `-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c
--fno-rtti -funsigned-char -fshort-enums -fshort-wchar`
-
-The compiled program can then be uploaded over SWD using your software of choice.
+### Toolchain
+Besides Flight Software's IntelliSat, I recommend that you try my [minimum development template](https://github.com/uwu64/cg3-stm32l476) that includes the exact bare minimum to compile and deploy firmware to Orbital Platform. The only dependencies are GCC for arm, pyocd, and make. 
 
 ![](pictures/opr3-2.JPG)
 
